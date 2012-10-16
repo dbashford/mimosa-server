@@ -4,10 +4,11 @@ fs =      require 'fs'
 express = require 'express'
 _ =       require 'lodash'
 engines = require 'consolidate'
+logger  = require 'mimosa-logger'
 
 class MimosaServer
 
-  lifecycleRegistration: (config, register, @logger) ->
+  lifecycleRegistration: (config, register) ->
     return unless config.isServer
     register ['buildDone'], 'server', @_startServer
 
@@ -18,11 +19,11 @@ class MimosaServer
       @_startProvidedServer(config, next)
 
   _startDefaultServer: (config, done) ->
-    @logger.debug "Setting up default express server"
+    logger.debug "Setting up default express server"
 
     app = express()
     server = app.listen config.server.port, =>
-      @logger.success "Mimosa's bundled Express started at http://localhost:#{config.server.port}#{config.server.base}"
+      logger.success "Mimosa's bundled Express started at http://localhost:#{config.server.port}#{config.server.base}"
       done()
 
     app.configure =>
@@ -63,7 +64,7 @@ class MimosaServer
         optimize:  config.optimize ? false
         cachebust: if process.env.NODE_ENV isnt "production" then "?b=#{(new Date()).getTime()}" else ''
 
-      @logger.debug "Options for index:\n#{JSON.stringify(options, null, 2)}"
+      logger.debug "Options for index:\n#{JSON.stringify(options, null, 2)}"
 
       # TODO, consider a configurable object of, action/url/viewname
       app.get '/', (req, res) -> res.render 'index', options
@@ -73,13 +74,13 @@ class MimosaServer
       if exists
         server = require config.server.path
         if server.startServer
-          @logger.success "Mimosa is starting your server: #{config.server.path}"
+          logger.success "Mimosa is starting your server: #{config.server.path}"
           conf = _.extend({}, config)
           server.startServer(conf)
         else
-          @logger.error "Found provided server located at #{config.server.path} (#{serverPath}) but it does not contain a 'startServer' method."
+          logger.error "Found provided server located at #{config.server.path} (#{serverPath}) but it does not contain a 'startServer' method."
       else
-        @logger.error "Attempted to start the provided server located at #{config.server.path} (#{serverPath}), but could not find it."
+        logger.error "Attempted to start the provided server located at #{config.server.path} (#{serverPath}), but could not find it."
       done()
 
 module.exports = new MimosaServer()
