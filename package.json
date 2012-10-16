@@ -1,0 +1,38 @@
+{
+  "name": "mimosa-server",
+  "preferGlobal": "false",
+  "version": "0.0.1",
+  "homepage": "http://www.mimosajs.com",
+  "author": "David Bashford",
+  "description": "Server module for Mimosa browser development workflow tool",
+  "contributors": [
+    {
+      "name": "David Bashford",
+      "email": "dbashford@hotmail.com"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dbashford/mimosa-server"
+  },
+  "keywords": [
+    "express",
+    "mimosa",
+    "mmodule",
+    "server",
+    "serve",
+    "reload",
+    "gzip"
+  ],
+  "dependencies": {
+    "watch-connect": "0.3.4",
+    "express": "3.0.0rc4",
+    "consolidate": "0.4.0",
+    "ejs": "0.8.3",
+    "lodash": "0.7.0"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=0.8"
+  }
+}
