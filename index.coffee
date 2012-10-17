@@ -53,7 +53,7 @@ class MimosaServer
       app.use express.static(config.watch.compiledDir)
 
     if config.server.views.html
-      name = if config.optimize
+      name = if config.isOptimize
         'index-optimize'
       else
         'index'
@@ -61,7 +61,7 @@ class MimosaServer
     else
       options =
         reload:    config.server.useReload
-        optimize:  config.optimize ? false
+        optimize:  config.isOptimize ? false
         cachebust: if process.env.NODE_ENV isnt "production" then "?b=#{(new Date()).getTime()}" else ''
 
       logger.debug "Options for index:\n#{JSON.stringify(options, null, 2)}"
