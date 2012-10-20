@@ -1,3 +1,5 @@
+path = require 'path'
+
 exports.defaults = ->
   server:
     useDefaultServer: false
@@ -28,5 +30,48 @@ exports.placeholder = ->
         # path: 'views'                     # path from the root of your project to your views
   """
 
-exports.validate = ->
+exports.validate = (config) ->
+  errors = []
+  if config.server?
+    if typeof config.server is "object" and not Array.isArray(config.server)
+      if config.server.useDefaultServer?
+        unless typeof config.server.useDefaultServer is "boolean"
+          errors.push "server.useDefaultServer must be a boolean."
+      if config.server.useReload?
+        unless typeof config.server.useReload is "boolean"
+          errors.push "server.useReload must be a boolean."
+      if config.server.path?
+        unless typeof config.server.path is "string"
+          errors.push "server.path must be a string."
+      if config.server.port?
+        unless typeof config.server.port is "number"
+          errors.push "server.port must be a number."
+      if config.server.base?
+        unless typeof config.server.base is "string"
+          errors.push "server.base must be a string."
+
+      if config.server.views?
+        if typeof config.server.views is "object" and not Array.isArray(config.server.views)
+          if config.server.views.compileWith?
+            unless typeof config.server.views.compileWith is "string"
+              errors.push "server.views.compileWith must be a string."
+          if config.server.views.extension?
+            unless typeof config.server.views.extension is "string"
+              errors.push "server.views.extension must be a string."
+          if config.server.views.path?
+            unless typeof config.server.views.path is "string"
+              errors.push "server.views.path must be a string."
+        else
+          errors.push "server.views must be an object."
+    else
+      errors.push "server configuration must be an object."
+
+  if errors.length is 0
+    config.server.path =       path.join config.root, config.server.path
+    config.server.views.path = path.join config.root, config.server.views.path
+    if config.server.views.compileWith is "html"
+      config.server.views.compileWith = "ejs"
+      config.server.views.html = true
+
+  errors
 

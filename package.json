@@ -29,7 +29,7 @@
     "express": "3.0.0rc4",
     "consolidate": "0.4.0",
     "ejs": "0.8.3",
-    "lodash": "0.7.0",
+    "lodash": "0.8.2",
     "mimosa-logger": "0.0.1"
   },
   "license": "MIT",
