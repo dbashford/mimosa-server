@@ -1,7 +1,7 @@
 {
   "name": "mimosa-server",
   "preferGlobal": "false",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "homepage": "http://www.mimosajs.com",
   "author": "David Bashford",
   "description": "Server module for Mimosa browser development workflow tool",
@@ -30,7 +30,7 @@
     "consolidate": "0.4.0",
     "ejs": "0.8.3",
     "lodash": "0.8.2",
-    "mimosa-logger": "0.1.0"
+    "logmimosa": "0.1.0"
   },
   "license": "MIT",
   "engines": {
