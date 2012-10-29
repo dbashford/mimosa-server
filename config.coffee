@@ -1,4 +1,5 @@
 path = require 'path'
+fs   = require 'fs'
 
 exports.defaults = ->
   server:
@@ -72,6 +73,12 @@ exports.validate = (config) ->
     if config.server.views.compileWith is "html"
       config.server.views.compileWith = "ejs"
       config.server.views.html = true
+
+    if config.isServer and not config.server.useDefaultServer
+      if not fs.existsSync(config.server.path)
+        errors.push "server.path [[ #{config.server.path}) ]] cannot be found"
+      else if fs.statSync(config.server.path).isDirectory()
+        errors.push "server.path [[ #{config.server.path} ]] cannot be found, expecting a file and is a directory"
 
   errors
 

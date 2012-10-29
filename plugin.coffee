@@ -3,7 +3,7 @@ fs =      require 'fs'
 express = require 'express'
 _ =       require 'lodash'
 engines = require 'consolidate'
-logger  = require 'mimosa-logger'
+logger  = require 'logmimosa'
 
 exports.registration = (config, register) ->
     return unless config.isServer
