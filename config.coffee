@@ -1,3 +1,5 @@
+"use strict"
+
 path = require 'path'
 fs   = require 'fs'
 
@@ -79,6 +81,9 @@ exports.validate = (config) ->
         errors.push "server.path [[ #{config.server.path}) ]] cannot be found"
       else if fs.statSync(config.server.path).isDirectory()
         errors.push "server.path [[ #{config.server.path} ]] cannot be found, expecting a file and is a directory"
+
+  if config.isBuild
+    config.server.useReload = false
 
   errors
 
