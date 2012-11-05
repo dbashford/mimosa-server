@@ -6,7 +6,6 @@ fs   = require 'fs'
 exports.defaults = ->
   server:
     useDefaultServer: false
-    useReload: true
     path: 'server.coffee'
     port: 3000
     base: ''
@@ -22,7 +21,6 @@ exports.placeholder = ->
     # server:                               # configuration for server when server option is enabled via CLI
       # useDefaultServer: false             # whether or not mimosa starts a default server for you, when true, mimosa starts its
                                             # own on the port below, when false, mimosa will use server provided by path below
-      # useReload: true                     # when true, browser will be reloaded when asset is compiled.
       # path: 'server.coffee'               # valid when useDefaultServer: false, path to file for provided server which must contain
                                             # export startServer method that takes an enriched mimosa-config object
       # port: 3000                          # port to start server on
@@ -40,9 +38,6 @@ exports.validate = (config) ->
       if config.server.useDefaultServer?
         unless typeof config.server.useDefaultServer is "boolean"
           errors.push "server.useDefaultServer must be a boolean."
-      if config.server.useReload?
-        unless typeof config.server.useReload is "boolean"
-          errors.push "server.useReload must be a boolean."
       if config.server.path?
         unless typeof config.server.path is "string"
           errors.push "server.path must be a string."
@@ -81,9 +76,6 @@ exports.validate = (config) ->
         errors.push "server.path [[ #{config.server.path}) ]] cannot be found"
       else if fs.statSync(config.server.path).isDirectory()
         errors.push "server.path [[ #{config.server.path} ]] cannot be found, expecting a file and is a directory"
-
-  if config.isBuild
-    config.server.useReload = false
 
   errors
 

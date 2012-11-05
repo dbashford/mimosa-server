@@ -1,7 +1,7 @@
 {
   "name": "mimosa-server",
   "preferGlobal": "false",
-  "version": "0.2.4",
+  "version": "0.3.0",
   "homepage": "http://www.mimosajs.com",
   "author": "David Bashford",
   "description": "Server module for Mimosa browser development workflow tool",
@@ -21,11 +21,9 @@
     "mmodule",
     "server",
     "serve",
-    "reload",
     "gzip"
   ],
   "dependencies": {
-    "watch-connect": "0.3.4",
     "express": "3.0.0rc4",
     "consolidate": "0.4.0",
     "lodash": "0.8.2",

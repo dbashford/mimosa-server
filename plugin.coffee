@@ -13,15 +13,15 @@ exports.registration = (config, register) ->
 
 _startServer = (config, options, next) ->
   if (config.server.useDefaultServer)
-    _startDefaultServer(config, next)
+    _startDefaultServer(config, options, next)
   else
-    _startProvidedServer(config, next)
+    _startProvidedServer(config, options, next)
 
-_startDefaultServer = (config, done) ->
+_startDefaultServer = (config, options, done) ->
   logger.debug "Setting up default express server"
 
   app = express()
-  server = app.listen config.server.port, =>
+  options.userServer = server = app.listen config.server.port, =>
     logger.success "Mimosa's bundled Express started at http://localhost:#{config.server.port}#{config.server.base}"
     done()
 
@@ -35,18 +35,6 @@ _startDefaultServer = (config, done) ->
     app.use (req, res, next) ->
       res.header 'Cache-Control', 'no-cache'
       next()
-
-    if config.server.useReload
-      opts =
-        server: server
-        basedir: config.server.views.path
-        watchdir: config.watch.compiledDir
-        skipAdding: true
-        exclude: ["almond\.js"]
-        additionaldirs: [config.server.views.path]
-
-      app.use (require 'watch-connect')(opts)
-
     app.use express.compress()
     app.use config.server.base, app.router
     app.use express.static(config.watch.compiledDir)
@@ -58,8 +46,9 @@ _startDefaultServer = (config, done) ->
       'index'
     app.get '/', (req, res) -> res.render name
   else
+    useReload = if config.liveReload?.enabled? then config.liveReload.enabled
     options =
-      reload:    config.server.useReload
+      reload:    useReload
       optimize:  config.isOptimize ? false
       cachebust: if process.env.NODE_ENV isnt "production" then "?b=#{(new Date()).getTime()}" else ''
 
@@ -68,14 +57,14 @@ _startDefaultServer = (config, done) ->
     # TODO, consider a configurable object of, action/url/viewname
     app.get '/', (req, res) -> res.render 'index', options
 
-_startProvidedServer = (config, done) ->
+_startProvidedServer = (config, options, done) ->
   fs.exists config.server.path, (exists) =>
     if exists
       server = require config.server.path
       if server.startServer
         logger.success "Mimosa is starting your server: #{config.server.path}"
         conf = _.extend({}, config)
-        server.startServer(conf)
+        options.userServer = server.startServer(conf)
       else
         logger.error "Found provided server located at #{config.server.path} (#{serverPath}) but it does not contain a 'startServer' method."
     else
