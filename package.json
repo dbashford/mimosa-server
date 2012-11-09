@@ -1,7 +1,7 @@
 {
   "name": "mimosa-server",
   "preferGlobal": "false",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "homepage": "http://www.mimosajs.com",
   "author": "David Bashford",
   "description": "Server module for Mimosa browser development workflow tool",

@@ -64,7 +64,12 @@ _startProvidedServer = (config, options, done) ->
       if server.startServer
         logger.success "Mimosa is starting your server: #{config.server.path}"
         conf = _.extend({}, config)
-        options.userServer = server.startServer(conf)
+        serverReturn = server.startServer(conf)
+        if serverReturn.server?
+          options.userServer = serverReturn.server
+          options.socketio = serverReturn.socketio
+        else
+          options.userServer = serverReturn
       else
         logger.error "Found provided server located at #{config.server.path} (#{serverPath}) but it does not contain a 'startServer' method."
     else
