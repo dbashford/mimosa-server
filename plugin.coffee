@@ -7,15 +7,24 @@ _ =       require 'lodash'
 engines = require 'consolidate'
 logger  = require 'logmimosa'
 
-exports.registration = (config, register) ->
+currentServer = null
+
+registration = (config, register) ->
     return unless config.isServer
     register ['buildDone'], 'server', _startServer
+
+startProvidedServer = (config, options, done) ->
+  if currentServer?.close
+    currentServer.close ->
+      _startProvidedServer config, options, done
+  else
+    _startProvidedServer config, options, done
 
 _startServer = (config, options, next) ->
   if (config.server.useDefaultServer)
     _startDefaultServer(config, options, next)
   else
-    _startProvidedServer(config, options, next)
+    startProvidedServer(config, options, next)
 
 _startDefaultServer = (config, options, done) ->
   logger.debug "Setting up default express server"
@@ -70,8 +79,15 @@ _startProvidedServer = (config, options, done) ->
           options.socketio = serverReturn.socketio
         else
           options.userServer = serverReturn
+
+        currentServer = options.userServer
       else
         logger.error "Found provided server located at #{config.server.path} (#{serverPath}) but it does not contain a 'startServer' method."
     else
       logger.error "Attempted to start the provided server located at #{config.server.path} (#{serverPath}), but could not find it."
     done()
+
+
+module.exports =
+  registration: registration
+  startServer:  startProvidedServer
