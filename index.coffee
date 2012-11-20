@@ -8,3 +8,4 @@ module.exports =
   defaults:     config.defaults
   placeholder:  config.placeholder
   validate:     config.validate
+  startServer:  plugin.startServer
