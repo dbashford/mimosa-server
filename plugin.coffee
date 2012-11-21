@@ -8,13 +8,15 @@ engines = require 'consolidate'
 logger  = require 'logmimosa'
 
 currentServer = null
+connections = []
 
 registration = (config, register) ->
     return unless config.isServer
     register ['buildDone'], 'server', _startServer
 
 startProvidedServer = (config, options, done) ->
-  if currentServer?.close
+  if currentServer?
+    __cleanUpConnections()
     currentServer.close ->
       _startProvidedServer config, options, done
   else
@@ -26,13 +28,20 @@ _startServer = (config, options, next) ->
   else
     startProvidedServer(config, options, next)
 
+__cleanUpConnections = ->
+  conn.connection.destroy() for conn in connections
+  connections = []
+
 _startDefaultServer = (config, options, done) ->
   logger.debug "Setting up default express server"
 
   app = express()
-  options.userServer = server = app.listen config.server.port, =>
+  options.userServer = currentServer = app.listen config.server.port, =>
     logger.success "Mimosa's bundled Express started at http://localhost:#{config.server.port}#{config.server.base}"
     done()
+
+  currentServer.on 'request', (request, response) ->
+    connections.push request
 
   app.configure =>
     app.set 'port', config.server.port
@@ -81,6 +90,8 @@ _startProvidedServer = (config, options, done) ->
           options.userServer = serverReturn
 
         currentServer = options.userServer
+        currentServer.on 'request', (request, response) ->
+          connections.push request
       else
         logger.error "Found provided server located at #{config.server.path} (#{serverPath}) but it does not contain a 'startServer' method."
     else
