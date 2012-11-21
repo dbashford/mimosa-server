@@ -3,6 +3,8 @@
 path = require 'path'
 fs   = require 'fs'
 
+windowsDrive = /^[A-Za-z]:\\/
+
 exports.defaults = ->
   server:
     useDefaultServer: false
@@ -68,17 +70,29 @@ exports.validate = (config) ->
       errors.push "server configuration must be an object."
 
   if errors.length is 0
-    config.server.path =       path.join config.root, config.server.path
-    config.server.views.path = path.join config.root, config.server.views.path
     if config.server.views.compileWith is "html"
       config.server.views.compileWith = "ejs"
       config.server.views.html = true
 
-    if config.isServer and not config.server.useDefaultServer
-      if not fs.existsSync(config.server.path)
-        errors.push "server.path [[ #{config.server.path}) ]] cannot be found"
-      else if fs.statSync(config.server.path).isDirectory()
-        errors.push "server.path [[ #{config.server.path} ]] cannot be found, expecting a file and is a directory"
+    config.server.path =       __determinePath config.server.path, config.root
+    config.server.views.path = __determinePath config.server.views.path, config.root
+
+    if config.isServer
+
+      if not fs.existsSync(config.server.views.path)
+        errors.push "server.views.path [[ #{config.server.views.path}) ]] cannot be found"
+      else if fs.statSync(config.server.views.path).isFile()
+        errors.push "server.views.path [[ #{config.server.views.path} ]] cannot be found, expecting a directory and is a file"
+
+      unless config.server.useDefaultServer
+        if not fs.existsSync(config.server.path)
+          errors.push "server.path [[ #{config.server.path}) ]] cannot be found"
+        else if fs.statSync(config.server.path).isDirectory()
+          errors.push "server.path [[ #{config.server.path} ]] cannot be found, expecting a file and is a directory"
 
   errors
 
+__determinePath = (thePath, relativeTo) ->
+  return thePath if windowsDrive.test thePath
+  return thePath if thePath.indexOf("/") is 0
+  path.join relativeTo, thePath
