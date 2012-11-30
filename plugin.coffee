@@ -12,7 +12,7 @@ connections = []
 
 registration = (config, register) ->
     return unless config.isServer
-    register ['buildDone'], 'server', _startServer
+    register ['postBuild'], 'server', _startServer
 
 startProvidedServer = (config, options, done) ->
   if currentServer?
