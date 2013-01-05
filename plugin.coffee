@@ -82,21 +82,24 @@ _startProvidedServer = (config, options, done) ->
       if server.startServer
         logger.success "Mimosa is starting your server: #{config.server.path}"
         conf = _.extend({}, config)
-        serverReturn = server.startServer(conf)
-        if serverReturn.server?
-          options.userServer = serverReturn.server
-          options.socketio = serverReturn.socketio
-        else
-          options.userServer = serverReturn
+        server.startServer conf, (userServer, socketio) ->
+          if userServer
+            options.userServer = currentServer = userServer
+            currentServer.on 'request', (request, response) ->
+              connections.push request
+          else
+            logger.error "A server was not provided when the startServer callback was executed"
 
-        currentServer = options.userServer
-        currentServer.on 'request', (request, response) ->
-          connections.push request
+          if socketio
+            options.socketio = socketio
+
+          done()
       else
-        logger.error "Found provided server located at #{config.server.path} (#{serverPath}) but it does not contain a 'startServer' method."
+        logger.error "Found provided server located at #{config.server.path} (#{serverPath}) but it does not contain a 'startServer' function."
+        done()
     else
       logger.error "Attempted to start the provided server located at #{config.server.path} (#{serverPath}), but could not find it."
-    done()
+      done()
 
 
 module.exports =
