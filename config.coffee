@@ -1,9 +1,6 @@
 "use strict"
 
-path = require 'path'
 fs   = require 'fs'
-
-windowsDrive = /^[A-Za-z]:\\/
 
 exports.defaults = ->
   server:
@@ -30,52 +27,35 @@ exports.placeholder = ->
       # port: 3000                 # port to start server on
       # base: ''                   # base of url for the app, if altered should start with a slash
       # views:                     # configuration for the view layer of your application
-        # compileWith: 'jade'      # Other valid options: "hogan", "html", "ejs". The compiler for
-                                   # your views.
+        # compileWith: 'jade'      # Valid options: "jade", "hogan", "html", "ejs", "handlebars".
+                                   # The compiler for your views.
         # extension: 'jade'        # extension of your server views
         # path: 'views'            # path from the root of your project to your views
   """
 
-exports.validate = (config) ->
+exports.validate = (config, validators) ->
   errors = []
-  if config.server?
-    if typeof config.server is "object" and not Array.isArray(config.server)
-      if config.server.useDefaultServer?
-        unless typeof config.server.useDefaultServer is "boolean"
-          errors.push "server.useDefaultServer must be a boolean."
-      if config.server.path?
-        unless typeof config.server.path is "string"
-          errors.push "server.path must be a string."
-      if config.server.port?
-        unless typeof config.server.port is "number"
-          errors.push "server.port must be a number."
-      if config.server.base?
-        unless typeof config.server.base is "string"
-          errors.push "server.base must be a string."
 
-      if config.server.views?
-        if typeof config.server.views is "object" and not Array.isArray(config.server.views)
-          if config.server.views.compileWith?
-            unless typeof config.server.views.compileWith is "string"
-              errors.push "server.views.compileWith must be a string."
-          if config.server.views.extension?
-            unless typeof config.server.views.extension is "string"
-              errors.push "server.views.extension must be a string."
-          if config.server.views.path?
-            unless typeof config.server.views.path is "string"
-              errors.push "server.views.path must be a string."
-        else
-          errors.push "server.views must be an object."
-    else
-      errors.push "server configuration must be an object."
+  if validators.ifExistsIsObject(errors, "server config", config.server)
+    validators.ifExistsIsBoolean(errors, "server.useDefaultServer", config.server.useDefaultServer)
+    validators.ifExistsIsString(errors, "server.path", config.server.path)
+    validators.ifExistsIsNumber(errors, "server.port", config.server.port)
+    validators.ifExistsIsString(errors, "server.base", config.server.base)
+
+    if validators.ifExistsIsObject(errors, "server.views", config.server.views)
+      if validators.ifExistsIsString(errors, "server.views.compileWith", config.server.views.compileWith)
+        unless ["jade", "hogan", "html", "ejs", "handlebars"].indexOf(config.server.views.compileWith) > -1
+          errors.push "server.views.compileWith must be one of the following: jade, hogan, html, ejs, handlebars."
+      validators.ifExistsIsString(errors, "server.views.extension", config.server.views.extension)
+      validators.ifExistsIsString(errors, "server.views.path", config.server.views.path)
 
   if errors.length is 0
     if config.server.views.compileWith is "html"
       config.server.views.compileWith = "ejs"
       config.server.views.html = true
 
-    config.server.path =       __determinePath config.server.path, config.root
-    config.server.views.path = __determinePath config.server.views.path, config.root
+    config.server.path =       validators.determinePath config.server.path, config.root
+    config.server.views.path = validators.determinePath config.server.views.path, config.root
 
     if config.isServer
 
@@ -91,8 +71,3 @@ exports.validate = (config) ->
           errors.push "server.path [[ #{config.server.path} ]] cannot be found, expecting a file and is a directory"
 
   errors
-
-__determinePath = (thePath, relativeTo) ->
-  return thePath if windowsDrive.test thePath
-  return thePath if thePath.indexOf("/") is 0
-  path.join relativeTo, thePath
