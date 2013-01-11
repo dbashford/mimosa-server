@@ -54,15 +54,15 @@ _startDefaultServer = (config, options, done) ->
       res.header 'Cache-Control', 'no-cache'
       next()
     app.use express.compress()
-    app.use config.server.base, app.router
     app.use express.static(config.watch.compiledDir)
+    app.use config.server.base, app.router
 
   if config.server.views.html
     name = if config.isOptimize
       'index-optimize'
     else
       'index'
-    app.get '/', (req, res) -> res.render name
+    app.get '/*', (req, res) -> res.render name
   else
     useReload = if config.liveReload?.enabled? then config.liveReload.enabled
     options =
@@ -73,7 +73,7 @@ _startDefaultServer = (config, options, done) ->
     logger.debug "Options for index:\n#{JSON.stringify(options, null, 2)}"
 
     # TODO, consider a configurable object of, action/url/viewname
-    app.get '/', (req, res) -> res.render 'index', options
+    app.get '/*', (req, res) -> res.render 'index', options
 
 _startProvidedServer = (config, options, done) ->
   fs.exists config.server.path, (exists) =>
