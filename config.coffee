@@ -4,7 +4,9 @@ fs   = require 'fs'
 
 exports.defaults = ->
   server:
-    useDefaultServer: false
+    defaultServer:
+      enabled: false
+      onePager: false
     path: 'server.coffee'
     port: 3000
     base: ''
@@ -18,10 +20,13 @@ exports.placeholder = ->
   \t
 
     # server:                      # configuration for server when server option is enabled via CLI
-      # useDefaultServer: false    # whether or not mimosa starts a default server for you, when
+      # defaultServer:
+        # enabled: false           # whether or not mimosa starts a default server for you, when
                                    # true, mimosa starts its own on the port below, when false,
                                    # Mimosa will use server provided by path below
-      # path: 'server.coffee'      # valid when useDefaultServer: false, path to file for provided
+        # onePager: false          # Whether or not your app is a one page application. When set to
+                                   # true, all routes will be pointed at index
+      # path: 'server.coffee'      # valid when defaultServer.enabled: false, path to file for provided
                                    # server which must contain export startServer method that takes
                                    # an enriched mimosa-config object
       # port: 3000                 # port to start server on
@@ -37,7 +42,8 @@ exports.validate = (config, validators) ->
   errors = []
 
   if validators.ifExistsIsObject(errors, "server config", config.server)
-    validators.ifExistsIsBoolean(errors, "server.useDefaultServer", config.server.useDefaultServer)
+    validators.ifExistsIsBoolean(errors, "server.defaultServer.enabled", config.server.defaultServer.enabled)
+    validators.ifExistsIsBoolean(errors, "server.defaultServer.onePager", config.server.defaultServer.onePager)
     validators.ifExistsIsString(errors, "server.path", config.server.path)
     validators.ifExistsIsNumber(errors, "server.port", config.server.port)
     validators.ifExistsIsString(errors, "server.base", config.server.base)
@@ -64,7 +70,7 @@ exports.validate = (config, validators) ->
       else if fs.statSync(config.server.views.path).isFile()
         errors.push "server.views.path [[ #{config.server.views.path} ]] cannot be found, expecting a directory and is a file"
 
-      unless config.server.useDefaultServer
+      unless config.server.defaultServer.enabled
         if not fs.existsSync(config.server.path)
           errors.push "server.path [[ #{config.server.path}) ]] cannot be found"
         else if fs.statSync(config.server.path).isDirectory()
