@@ -55,13 +55,8 @@ _startDefaultServer = (config, options, done) ->
       res.header 'Cache-Control', 'no-cache'
       next()
     app.use express.compress()
-
-    if config.server.defaultServer.onePager
-      app.use express.static(config.watch.compiledDir)
-      app.use config.server.base, app.router
-    else
-      app.use config.server.base, app.router
-      app.use express.static(config.watch.compiledDir)
+    app.use express.static(config.watch.compiledDir)
+    app.use config.server.base, app.router
 
   if config.server.views.html
     indexName = if config.isOptimize
@@ -72,7 +67,7 @@ _startDefaultServer = (config, options, done) ->
       app.get '*/?', (req, res) -> res.render indexName
     else
       app.get '/', (req, res) -> res.render indexName
-      app.get '/:viewname', (req, res) ->
+      app.get '/:viewname/*', (req, res) ->
         viewName = req.params.viewname
         if config.isOptimize
           viewName += "-optimize"
@@ -88,7 +83,7 @@ _startDefaultServer = (config, options, done) ->
       app.get '*/?', (req, res) -> res.render 'index', options
     else
       app.get '/', (req, res) -> res.render 'index', options
-      app.get '/:viewname', (req, res) -> res.render req.params.viewname, options
+      app.get '/:viewname/*', (req, res) -> res.render req.params.viewname, options
 
 _startProvidedServer = (config, options, done) ->
   fs.exists config.server.path, (exists) =>
