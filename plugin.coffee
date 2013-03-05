@@ -67,7 +67,7 @@ _startDefaultServer = (config, options, done) ->
       app.get '*/?', (req, res) -> res.render indexName
     else
       app.get '/', (req, res) -> res.render indexName
-      app.get '/:viewname/*', (req, res) ->
+      app.get '/:viewname*/?', (req, res) ->
         viewName = req.params.viewname
         if config.isOptimize
           viewName += "-optimize"
@@ -83,7 +83,13 @@ _startDefaultServer = (config, options, done) ->
       app.get '*/?', (req, res) -> res.render 'index', options
     else
       app.get '/', (req, res) -> res.render 'index', options
-      app.get '/:viewname/*', (req, res) -> res.render req.params.viewname, options
+      app.get '/:viewname*/?', (req, res) ->
+        res.render req.params.viewname, options, (err, html) ->
+          if err
+            logger.warn "404. View with the name [[ #{req.params.viewname} ]] does not exist. Does a view template with that name exist in [[ #{config.server.views.path} ]]?"
+            res.send 404, "Cannot GET /#{req.params.viewname}"
+          else
+            res.send html
 
 _startProvidedServer = (config, options, done) ->
   fs.exists config.server.path, (exists) =>
