@@ -36,7 +36,10 @@ exports.placeholder = ->
         # compileWith: 'jade'      # Valid options: "jade", "hogan", "html", "ejs", "handlebars".
                                    # The compiler for your views.
         # extension: 'jade'        # extension of your server views
-        # path: 'views'            # path from the root of your project to your views
+        # path: 'views'            # This is the path to project views, it can be absolute or
+                                   # relative. If defaultServer.enabled is true, it is relative to the
+                                   # root of the project. If defaultServer.enabled is false it is
+                                   # relative to the server.path setting above.
   """
 
 exports.validate = (config, validators) ->
