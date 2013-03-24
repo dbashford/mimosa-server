@@ -1,6 +1,7 @@
 "use strict"
 
 fs   = require 'fs'
+path = require 'path'
 
 exports.defaults = ->
   server:
@@ -61,7 +62,13 @@ exports.validate = (config, validators) ->
       config.server.views.html = true
 
     config.server.path =       validators.determinePath config.server.path, config.root
-    config.server.views.path = validators.determinePath config.server.views.path, config.root
+
+    viewsRelativeTo = if config.server.defaultServer.enabled
+      config.root
+    else
+      path.dirname(config.server.path)
+
+    config.server.views.path = validators.determinePath config.server.views.path, viewsRelativeTo
 
     if config.isServer
 
