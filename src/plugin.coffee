@@ -111,10 +111,10 @@ _startProvidedServer = (config, options, done) ->
 
           done()
       else
-        logger.error "Found provided server located at #{config.server.path} (#{serverPath}) but it does not contain a 'startServer' function."
+        logger.error "Found provided server located at #{config.server.path} but it does not contain a 'startServer' function."
         done()
     else
-      logger.error "Attempted to start the provided server located at #{config.server.path} (#{serverPath}), but could not find it."
+      logger.error "Attempted to start the provided server located at #{config.server.path}, but could not find it."
       done()
 
 
