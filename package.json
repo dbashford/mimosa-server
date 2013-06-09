@@ -1,6 +1,6 @@
 {
   "name": "mimosa-server",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "homepage": "http://www.mimosajs.com",
   "author": "David Bashford",
   "description": "Server module for Mimosa browser development workflow tool",
@@ -23,13 +23,13 @@
     "gzip"
   ],
   "dependencies": {
-    "express": "3.2.3",
+    "express": "3.2.6",
     "consolidate": "0.9.1",
     "lodash": "1.2.1",
     "logmimosa": "0.5.0",
-    "jade": "0.30.0",
+    "jade": "0.31.2",
     "hogan.js": "2.0.0",
-    "ejs": "0.8.3"
+    "ejs": "0.8.4"
   },
   "license": "MIT",
   "engines": {
