@@ -86,8 +86,8 @@ _startDefaultServer = (config, options, done) ->
       app.get '/:viewname*/?', (req, res) ->
         res.render req.params.viewname, options, (err, html) ->
           if err
-            logger.warn "404. Cannot GET #{originalUrl}"
-            res.send 404, "Cannot GET #{originalUrl}"
+            logger.warn "404", err
+            res.send 404, "Could not find #{req.params.viewname}"
           else
             res.send html
 

@@ -33,7 +33,7 @@ exports.placeholder = ->
       # port: 3000                 # port to start server on
       # base: ''                   # base of url for the app, if altered should start with a slash
       # views:                     # configuration for the view layer of your application
-        # compileWith: 'jade'      # Valid options: "jade", "hogan", "html", "ejs", "handlebars".
+        # compileWith: 'jade'      # Valid options: "jade", "hogan", "html", "ejs", "handlebars", "dust".
                                    # The compiler for your views.
         # extension: 'jade'        # extension of your server views
         # path: 'views'            # This is the path to project views, it can be absolute or
@@ -54,8 +54,8 @@ exports.validate = (config, validators) ->
 
     if validators.ifExistsIsObject(errors, "server.views", config.server.views)
       if validators.ifExistsIsString(errors, "server.views.compileWith", config.server.views.compileWith)
-        unless ["jade", "hogan", "html", "ejs", "handlebars"].indexOf(config.server.views.compileWith) > -1
-          errors.push "server.views.compileWith must be one of the following: jade, hogan, html, ejs, handlebars."
+        unless ["jade", "hogan", "html", "ejs", "handlebars", "dust"].indexOf(config.server.views.compileWith) > -1
+          errors.push "server.views.compileWith must be one of the following: jade, hogan, html, ejs, handlebars, dust."
       validators.ifExistsIsString(errors, "server.views.extension", config.server.views.extension)
       validators.ifExistsIsString(errors, "server.views.path", config.server.views.path)
 
@@ -64,7 +64,7 @@ exports.validate = (config, validators) ->
       config.server.views.compileWith = "ejs"
       config.server.views.html = true
 
-    config.server.path =       validators.determinePath config.server.path, config.root
+    config.server.path = validators.determinePath config.server.path, config.root
 
     viewsRelativeTo = if config.server.defaultServer.enabled
       config.root
