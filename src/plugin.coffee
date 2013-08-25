@@ -29,7 +29,8 @@ _startServer = (config, options, next) ->
     startProvidedServer(config, options, next)
 
 __cleanUpConnections = ->
-  conn.connection.destroy() for conn in connections
+  for conn in connections
+    conn.destroy()
   connections = []
 
 _startDefaultServer = (config, options, done) ->
@@ -40,8 +41,11 @@ _startDefaultServer = (config, options, done) ->
     logger.success "Mimosa's bundled Express started at http://localhost:#{config.server.port}#{config.server.base}"
     done()
 
-  currentServer.on 'request', (request, response) ->
-    connections.push request
+  currentServer.on 'connection', (conn) ->
+    conn._id = new Date().getTime()
+    conn.on 'close', ->
+      _removeFromConnections conn._id
+    connections.push conn
 
   app.configure =>
     app.set 'port', config.server.port
@@ -101,8 +105,11 @@ _startProvidedServer = (config, options, done) ->
         server.startServer conf, (userServer, socketio) ->
           if userServer
             options.userServer = currentServer = userServer
-            currentServer.on 'request', (request, response) ->
-              connections.push request
+            currentServer.on 'connection', (conn) ->
+              conn._id = new Date().getTime()
+              conn.on 'close', ->
+                _removeFromConnections conn._id
+              connections.push conn
           else
             logger.error "A server was not provided when the startServer callback was executed"
 
@@ -117,6 +124,8 @@ _startProvidedServer = (config, options, done) ->
       logger.error "Attempted to start the provided server located at #{config.server.path}, but could not find it."
       done()
 
+_removeFromConnections = (id) ->
+  connections = connections.filter (conn) -> conn._id isnt id
 
 module.exports =
   registration: registration
