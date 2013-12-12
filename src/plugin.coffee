@@ -88,12 +88,15 @@ _startDefaultServer = (config, options, done) ->
     else
       app.get '/', (req, res) -> res.render 'index', options
       app.get '/:viewname*/?', (req, res) ->
-        res.render req.params.viewname, options, (err, html) ->
-          if err
-            logger.warn "404", err
-            res.send 404, "Could not find #{req.params.viewname}"
-          else
-            res.send html
+        try
+          res.render req.params.viewname, options, (err, html) ->
+            if err
+              logger.warn "404", err
+              res.send 404, "Could not find #{req.params.viewname}"
+            else
+              res.send html
+        catch err
+          res.send 404, "Could not find #{req.params.viewname}"
 
 _startProvidedServer = (config, options, done) ->
   fs.exists config.server.path, (exists) =>
