@@ -91,7 +91,7 @@ _startDefaultServer = (config, options, done) ->
         try
           res.render req.params.viewname, options, (err, html) ->
             if err
-              logger.warn "404", err
+              logger.warn "Sending 404 for URL [[ #{req.url} ]], ", err
               res.send 404, "Could not find #{req.params.viewname}"
             else
               res.send html
