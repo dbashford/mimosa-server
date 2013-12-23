@@ -10,6 +10,8 @@ logger  = require 'logmimosa'
 currentServer = null
 connections = []
 
+transpilers = ["coffee-script", "iced-coffee-script", "LiveScript", "coco"]
+
 registration = (config, register) ->
     return unless config.isServer
     register ['postBuild'], 'server', _startServer
@@ -99,6 +101,12 @@ _startDefaultServer = (config, options, done) ->
           res.send 404, "Could not find #{req.params.viewname}"
 
 _startProvidedServer = (config, options, done) ->
+  if config.server.packageJSON?.dependencies?
+    deps = Object.keys(config.server.packageJSON.dependencies)
+    if logger.debug
+      logger.debug _.intersection(deps, transpilers), "being required in by mimosa-server"
+    _.intersection(deps, transpilers).forEach require
+
   fs.exists config.server.path, (exists) =>
     if exists
       server = require config.server.path

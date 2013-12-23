@@ -11,6 +11,7 @@ exports.defaults = ->
     path: 'server.coffee'
     port: 3000
     base: ''
+    packageJSONDir: null
     views:
       compileWith: 'jade'
       extension: 'jade'
@@ -30,6 +31,8 @@ exports.placeholder = ->
       # path: 'server.coffee'      # valid when defaultServer.enabled: false, path to file for provided
                                    # server which must contain export startServer method that takes
                                    # an enriched mimosa-config object
+      # packageJSONDir: null       # If using own server, not default server, this is the location of
+                                   # project's package.json. Defaults to location of mimosa-config.
       # port: 3000                 # port to start server on
       # base: ''                   # base of url for the app, if altered should start with a slash
       # views:                     # configuration for the view layer of your application
@@ -49,6 +52,7 @@ exports.validate = (config, validators) ->
     validators.ifExistsIsBoolean(errors, "server.defaultServer.enabled", config.server.defaultServer.enabled)
     validators.ifExistsIsBoolean(errors, "server.defaultServer.onePager", config.server.defaultServer.onePager)
     validators.ifExistsIsString(errors, "server.path", config.server.path)
+    validators.ifExistsIsString(errors, "server.packageJSONDir", config.server.packageJSONDir)
     validators.ifExistsIsNumber(errors, "server.port", config.server.port)
     validators.ifExistsIsString(errors, "server.base", config.server.base)
 
@@ -85,5 +89,12 @@ exports.validate = (config, validators) ->
           errors.push "server.path [[ #{config.server.path}) ]] cannot be found"
         else if fs.statSync(config.server.path).isDirectory()
           errors.push "server.path [[ #{config.server.path} ]] cannot be found, expecting a file and is a directory"
+
+        config.server.packageJSONDir = validators.determinePath config.server.packageJSONDir ? config.root, config.root
+        config.server.packageJSONDir = path.join(config.server.packageJSONDir, "package.json")
+        if fs.existsSync(config.server.packageJSONDir)
+          config.server.packageJSON = require config.server.packageJSONDir
+        else
+          errors.push "server.packageJSONDir [[ #{config.server.packageJSONDir}) ]] cannot be found"
 
   errors
