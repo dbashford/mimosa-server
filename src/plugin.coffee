@@ -106,7 +106,10 @@ _startProvidedServer = (config, options, done) ->
     deps = Object.keys(config.server.packageJSON.dependencies)
     if logger.debug
       logger.debug _.intersection(deps, transpilers), "being required in by mimosa-server"
-    _.intersection(deps, transpilers).forEach require
+    _.intersection(deps, transpilers).forEach (transpiler) ->
+      transp = require transpiler
+      if transp.register
+        transp.register()
 
   fs.exists config.server.path, (exists) =>
     if exists
