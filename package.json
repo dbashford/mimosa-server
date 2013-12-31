@@ -1,6 +1,6 @@
 {
   "name": "mimosa-server",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "homepage": "http://www.mimosa.io",
   "author": "David Bashford",
   "description": "Server module for Mimosa browser development workflow tool",
@@ -23,14 +23,14 @@
     "gzip"
   ],
   "dependencies": {
-    "express": "3.3.5",
-    "consolidate": "0.9.1",
+    "express": "3.4.7",
+    "consolidate": "0.10.0",
     "lodash": "1.3.1",
-    "logmimosa": "0.5.0",
+    "logmimosa": "0.6.0",
     "jade": "0.35.0",
     "hogan.js": "2.0.0",
-    "ejs": "0.8.4",
-    "dustjs-linkedin": "2.0.2"
+    "ejs": "0.8.5",
+    "dustjs-linkedin": "2.2.2"
   },
   "license": "MIT",
   "engines": {
