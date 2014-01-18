@@ -1,7 +1,7 @@
 "use strict"
 
 fs =      require 'fs'
-
+path =    require 'path'
 express = require 'express'
 _ =       require 'lodash'
 engines = require 'consolidate'
@@ -104,10 +104,10 @@ _startDefaultServer = (config, options, done) ->
 _startProvidedServer = (config, options, done) ->
   if config.server.packageJSON?.dependencies?
     deps = Object.keys(config.server.packageJSON.dependencies)
-    if logger.debug
-      logger.debug _.intersection(deps, transpilers), "being required in by mimosa-server"
     _.intersection(deps, transpilers).forEach (transpiler) ->
-      transp = require transpiler
+      transp = require(path.join config.root, "node_modules", transpiler)
+      if logger.debug
+        logger.debug transp, "being required in by mimosa-server"
       if transp.register
         transp.register()
 
