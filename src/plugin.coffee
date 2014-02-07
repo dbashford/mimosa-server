@@ -5,18 +5,24 @@ path =    require 'path'
 express = require 'express'
 _ =       require 'lodash'
 engines = require 'consolidate'
-logger  = require 'logmimosa'
 
 currentServer = null
 connections = []
+logger = null
 
 transpilers = ["coffee-script", "iced-coffee-script", "LiveScript", "coco"]
 
 registration = (config, register) ->
     return unless config.isServer
+
+    logger = config.log
+
     register ['postBuild'], 'server', _startServer
 
 startProvidedServer = (config, options, done) ->
+  unless logger
+    logger = config.log
+
   if currentServer?
     __cleanUpConnections()
     currentServer.close ->
@@ -40,7 +46,7 @@ _startDefaultServer = (config, options, done) ->
 
   app = express()
   options.userServer = currentServer = app.listen config.server.port, =>
-    logger.success "Mimosa's bundled Express started at http://localhost:#{config.server.port}#{config.server.base}"
+    logger.success "Mimosa's bundled Express started at [[ http://localhost:#{config.server.port}#{config.server.base} ]]"
     done()
 
   currentServer.on 'connection', (conn) ->
@@ -105,9 +111,10 @@ _startProvidedServer = (config, options, done) ->
   if config.server.packageJSON?.dependencies?
     deps = Object.keys(config.server.packageJSON.dependencies)
     _.intersection(deps, transpilers).forEach (transpiler) ->
+      if logger.debug and logger.isDebug()
+        logger.debug transpiler, "being required in by mimosa-server"
+
       transp = require(path.join config.root, "node_modules", transpiler)
-      if logger.debug
-        logger.debug transp, "being required in by mimosa-server"
       if transp.register
         transp.register()
 
@@ -115,7 +122,7 @@ _startProvidedServer = (config, options, done) ->
     if exists
       server = require config.server.path
       if server.startServer
-        logger.success "Mimosa is starting your server: #{config.server.path}"
+        logger.success "Mimosa is starting your server: [[ #{config.server.path} ]]"
         conf = _.extend({}, config)
         server.startServer conf, (userServer, socketio) ->
           if userServer
@@ -133,10 +140,10 @@ _startProvidedServer = (config, options, done) ->
 
           done()
       else
-        logger.error "Found provided server located at #{config.server.path} but it does not contain a 'startServer' function."
+        logger.error "Found provided server located at [[ #{config.server.path} ]] but it does not contain a 'startServer' function."
         done()
     else
-      logger.error "Attempted to start the provided server located at #{config.server.path}, but could not find it."
+      logger.error "Attempted to start the provided server located at [[ #{config.server.path} ]], but could not find it."
       done()
 
 _removeFromConnections = (id) ->
