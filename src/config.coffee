@@ -21,29 +21,29 @@ exports.placeholder = ->
   """
   \t
 
-    # server:                      # configuration for server when server option is enabled via CLI
-      # defaultServer:
-        # enabled: false           # whether or not mimosa starts a default server for you, when
-                                   # true, mimosa starts its own on the port below, when false,
-                                   # Mimosa will use server provided by path below
-        # onePager: false          # Whether or not your app is a one page application. When set to
-                                   # true, all routes will be pointed at index
-      # path: 'server.coffee' or 'server.js'  # valid when defaultServer.enabled: false, path to file
-                                   # for provided server which must contain export startServer method
-                                   # that takes an enriched mimosa-config object. Either server.coffee
-                                   # or server.js files will be found and used by default.
-      # packageJSONDir: null       # If using own server, not default server, this is the location of
-                                   # project's package.json. Defaults to location of mimosa-config.
-      # port: 3000                 # port to start server on
-      # base: ''                   # base of url for the app, if altered should start with a slash
-      # views:                     # configuration for the view layer of your application
-        # compileWith: 'jade'      # Valid options: "jade", "hogan", "html", "ejs", "handlebars", "dust".
-                                   # The compiler for your views.
-        # extension: 'jade'        # extension of your server views
-        # path: 'views'            # This is the path to project views, it can be absolute or
-                                   # relative. If defaultServer.enabled is true, it is relative to the
-                                   # root of the project. If defaultServer.enabled is false it is
-                                   # relative to the server.path setting above.
+    server:                      # configuration for server when server option is enabled via CLI
+      defaultServer:
+        enabled: false           # whether or not mimosa starts a default server for you, when
+                                 # true, mimosa starts its own on the port below, when false,
+                                 # Mimosa will use server provided by path below
+        onePager: false          # Whether or not your app is a one page application. When set to
+                                 # true, all routes will be pointed at index
+      path: 'server.coffee' or 'server.js'  # valid when defaultServer.enabled: false, path to file
+                                 # for provided server which must contain export startServer method
+                                 # that takes an enriched mimosa-config object. Either server.coffee
+                                 # or server.js files will be found and used by default.
+      packageJSONDir: null       # If using own server, not default server, this is the location of
+                                 # project's package.json. Defaults to location of mimosa-config.
+      port: 3000                 # port to start server on
+      base: ''                   # base of url for the app, if altered should start with a slash
+      views:                     # configuration for the view layer of your application
+        compileWith: 'jade'      # Valid options: "jade", "hogan", "html", "ejs", "handlebars", "dust".
+                                 # The compiler for your views.
+        extension: 'jade'        # extension of your server views
+        path: 'views'            # This is the path to project views, it can be absolute or
+                                 # relative. If defaultServer.enabled is true, it is relative to the
+                                 # root of the project. If defaultServer.enabled is false it is
+                                 # relative to the server.path setting above.
   """
 
 exports.validate = (config, validators) ->
