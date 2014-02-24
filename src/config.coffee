@@ -28,9 +28,10 @@ exports.placeholder = ->
                                    # Mimosa will use server provided by path below
         # onePager: false          # Whether or not your app is a one page application. When set to
                                    # true, all routes will be pointed at index
-      # path: 'server.coffee'      # valid when defaultServer.enabled: false, path to file for provided
-                                   # server which must contain export startServer method that takes
-                                   # an enriched mimosa-config object
+      # path: 'server.coffee' or 'server.js'  # valid when defaultServer.enabled: false, path to file
+                                   # for provided server which must contain export startServer method
+                                   # that takes an enriched mimosa-config object. Either server.coffee
+                                   # or server.js files will be found and used by default.
       # packageJSONDir: null       # If using own server, not default server, this is the location of
                                    # project's package.json. Defaults to location of mimosa-config.
       # port: 3000                 # port to start server on
@@ -86,7 +87,18 @@ exports.validate = (config, validators) ->
 
       unless config.server.defaultServer.enabled
         if not fs.existsSync(config.server.path)
-          errors.push "server.path [[ #{config.server.path}) ]] cannot be found"
+          serverPathExt = path.extname(config.server.path)
+
+          if serverPathExt is ".coffee"
+            # is default, try server.js
+            tempServerPath = config.server.path.replace(/.coffee$/, ".js")
+            if fs.existsSync(tempServerPath)
+              config.server.path = tempServerPath
+            else
+              errors.push "server.path [[ #{config.server.path}) ]] cannot be found"
+          else
+            errors.push "server.path [[ #{config.server.path}) ]] cannot be found"
+
         else if fs.statSync(config.server.path).isDirectory()
           errors.push "server.path [[ #{config.server.path} ]] cannot be found, expecting a file and is a directory"
 
