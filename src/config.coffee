@@ -109,4 +109,14 @@ exports.validate = (config, validators) ->
         else
           errors.push "server.packageJSONDir [[ #{config.server.packageJSONDir}) ]] cannot be found"
 
+  # if server not selected, some things might still expect proper server path in place (like web-package)
+  if errors.length is 0 and not config.isServer
+    if not fs.existsSync(config.server.path)
+      serverPathExt = path.extname(config.server.path)
+      if serverPathExt is ".coffee"
+        tempServerPath = config.server.path.replace(/.coffee$/, ".js")
+        if fs.existsSync(tempServerPath)
+          config.server.path = tempServerPath
+
+
   errors
