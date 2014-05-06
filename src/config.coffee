@@ -1,8 +1,5 @@
 "use strict"
 
-fs   = require 'fs'
-path = require 'path'
-
 exports.defaults = ->
   server:
     defaultServer:
@@ -47,6 +44,9 @@ exports.placeholder = ->
   """
 
 exports.validate = (config, validators) ->
+  fs   = require 'fs'
+  path = require 'path'
+  
   errors = []
 
   if validators.ifExistsIsObject(errors, "server config", config.server)
