@@ -40,6 +40,10 @@ _startProvidedServer = (config, options, done) ->
               conn.on 'close', ->
                 _removeFromConnections conn._id
               connections.push conn
+
+            # listen for call to stop mimosa
+            process.on 'STOPMIMOSA', ->
+              currentServer.close()
           else
             config.log.error "A server was not provided when the startServer callback was executed"
 
