@@ -13,6 +13,7 @@ exports.defaults = ->
       compileWith: 'jade'
       extension: 'jade'
       path: 'views'
+      options: {}
 
 exports.placeholder = ->
   """
@@ -41,12 +42,14 @@ exports.placeholder = ->
                                  # relative. If defaultServer.enabled is true, it is relative to the
                                  # root of the project. If defaultServer.enabled is false it is
                                  # relative to the server.path setting above.
+        options:{}               # Options to pass to any views being served by Mimosa's default
+                                 # server.
   """
 
 exports.validate = (config, validators) ->
   fs   = require 'fs'
   path = require 'path'
-  
+
   errors = []
 
   if validators.ifExistsIsObject(errors, "server config", config.server)
@@ -58,6 +61,7 @@ exports.validate = (config, validators) ->
     validators.ifExistsIsString(errors, "server.base", config.server.base)
 
     if validators.ifExistsIsObject(errors, "server.views", config.server.views)
+      validators.ifExistsIsObject(errors, "server.views.options", config.server.views.options)
       if validators.ifExistsIsString(errors, "server.views.compileWith", config.server.views.compileWith)
         unless ["jade", "hogan", "html", "ejs", "handlebars", "dust"].indexOf(config.server.views.compileWith) > -1
           errors.push "server.views.compileWith must be one of the following: jade, hogan, html, ejs, handlebars, dust."
