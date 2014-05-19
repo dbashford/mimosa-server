@@ -1,6 +1,8 @@
 express = require 'express'
 engines = require 'consolidate'
 
+_ = require 'lodash'
+
 connections = []
 currentServer = null
 
@@ -57,6 +59,8 @@ exports.start = (config, options, done) ->
       reload:    useReload
       optimize:  config.isOptimize ? false
       cachebust: if process.env.NODE_ENV isnt "production" then "?b=#{(new Date()).getTime()}" else ''
+
+    _.extend(options, config.server.views.options)
 
     if config.server.defaultServer.onePager
       app.get '*/?', (req, res) -> res.render 'index', options
