@@ -30,11 +30,12 @@ _startProvidedServer = (config, options, done) ->
     if exists
       server = require config.server.path
       if server.startServer
+        config.server.userServerFile = server
         config.log.success "Mimosa is starting your server: [[ #{config.server.path} ]]"
         conf = _.extend({}, config)
         server.startServer conf, (userServer, socketio) ->
           if userServer
-            options.userServer = currentServer = userServer
+            config.server.userServerObject = options.userServer = currentServer = userServer
             currentServer.on 'connection', (conn) ->
               conn._id = new Date().getTime()
               conn.on 'close', ->
