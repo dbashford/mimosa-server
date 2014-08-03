@@ -62,7 +62,8 @@ _startProvidedServer = (config, options, done) ->
 exports.start = (config, options, done) ->
   if currentServer
     _cleanUpConnections()
-    currentServer.close ->
-      _startProvidedServer config, options, done
+    process.nextTick ->
+      currentServer.close ->
+        _startProvidedServer config, options, done
   else
     _startProvidedServer config, options, done
