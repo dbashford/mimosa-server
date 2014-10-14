@@ -59,6 +59,7 @@ exports.start = (config, options, done) ->
       reload:    useReload
       optimize:  config.isOptimize ? false
       cachebust: if process.env.NODE_ENV isnt "production" then "?b=#{(new Date()).getTime()}" else ''
+      pretty:    true
 
     _.extend(options, config.server.views.options)
 
