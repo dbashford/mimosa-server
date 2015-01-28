@@ -8,7 +8,7 @@ exports.defaults = ->
     path: 'server.coffee'
     port: 3000
     base: ''
-    packageJSONDir: null
+    transpiler: undefined
     views:
       compileWith: 'jade'
       extension: 'jade'
@@ -30,10 +30,10 @@ exports.placeholder = ->
                                  # for provided server which must contain export startServer method
                                  # that takes an enriched mimosa-config object. Either server.coffee
                                  # or server.js files will be found and used by default.
-      packageJSONDir: null       # If using own server, not default server, this is the location of
-                                 # project's package.json. Defaults to location of mimosa-config.
       port: 3000                 # port to start server on
       base: ''                   # base of url for the app, if altered should start with a slash
+      transpiler: undefined      # If your application is written in a language that needs transpiling,
+                                 # require('') the transpiler here. For instance, require('coffee-script')
       views:                     # configuration for the view layer of your application
         compileWith: 'jade'      # Valid options: "jade", "hogan", "html", "ejs", "handlebars", "dust".
                                  # The compiler for your views.
@@ -56,9 +56,11 @@ exports.validate = (config, validators) ->
     validators.ifExistsIsBoolean(errors, "server.defaultServer.enabled", config.server.defaultServer.enabled)
     validators.ifExistsIsBoolean(errors, "server.defaultServer.onePager", config.server.defaultServer.onePager)
     validators.ifExistsIsString(errors, "server.path", config.server.path)
-    validators.ifExistsIsString(errors, "server.packageJSONDir", config.server.packageJSONDir)
     validators.ifExistsIsNumber(errors, "server.port", config.server.port)
     validators.ifExistsIsString(errors, "server.base", config.server.base)
+
+    if config.server.transpiler and config.server.transpiler.register
+      config.server.transpiler.register()
 
     if validators.ifExistsIsObject(errors, "server.views", config.server.views)
       validators.ifExistsIsObject(errors, "server.views.options", config.server.views.options)
@@ -105,13 +107,6 @@ exports.validate = (config, validators) ->
 
         else if fs.statSync(config.server.path).isDirectory()
           errors.push "server.path [[ #{config.server.path} ]] cannot be found, expecting a file and is a directory"
-
-        config.server.packageJSONDir = validators.determinePath config.server.packageJSONDir ? config.root, config.root
-        config.server.packageJSONDir = path.join(config.server.packageJSONDir, "package.json")
-        if fs.existsSync(config.server.packageJSONDir)
-          config.server.packageJSON = require config.server.packageJSONDir
-        else
-          errors.push "server.packageJSONDir [[ #{config.server.packageJSONDir}) ]] cannot be found"
 
   # if server not selected, some things might still expect proper server path in place (like web-package)
   if errors.length is 0 and not config.isServer

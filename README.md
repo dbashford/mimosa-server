@@ -59,6 +59,7 @@ server: {
     onePager: false
   },
   path: 'server.js',
+  transpiler: null,  
   port: 3000,
   base: '',
   views: {
@@ -78,6 +79,9 @@ Whether a project is a one or multi page application. This effects how mimosa-se
 
 #### `server.path` string
 When `defaultServer.enabled` is set to `false`, `server.path` is the path to the project's server code. The path can be relative to the root of the application or absolute. The server code at `server.path` must export a `startServer` function. Mimosa will pass that method a copy of the mimosa-config. `startServer` will also be passed a callback that it must execute when complete. Both 'server.coffee' and 'server.js' are valid defaults.
+
+#### `server.transpiler` transpiler library
+If your application is written in a language that needs transpiling, `require('')` the transpiler here. For instance, `require('coffee-script')`.
 
 #### `server.port` number
 The port on which mimosa-server starts the server.

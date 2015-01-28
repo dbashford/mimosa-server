@@ -16,16 +16,6 @@ _removeFromConnections = (id) ->
   connections = connections.filter (conn) -> conn._id isnt id
 
 _startProvidedServer = (config, options, done) ->
-  if config.server.packageJSON?.dependencies?
-    deps = Object.keys(config.server.packageJSON.dependencies)
-    _.intersection(deps, transpilers).forEach (transpiler) ->
-      if config.log.debug and config.log.isDebug()
-        config.log.debug transpiler, "being required in by mimosa-server"
-
-      transp = require(path.join config.root, "node_modules", transpiler)
-      if transp.register
-        transp.register()
-
   fs.exists config.server.path, (exists) =>
     if exists
       server = require config.server.path
